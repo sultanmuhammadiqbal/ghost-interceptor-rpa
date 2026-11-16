@@ -19,6 +19,7 @@ fs.promises.realpath = async function (p, options) {
 };
 
 const origRealpathSync = fs.realpathSync.bind(fs);
+const origRealpathSyncNative = fs.realpathSync.native?.bind(fs.realpathSync);
 fs.realpathSync = function (p, options) {
   try {
     return origRealpathSync(p, options);
@@ -29,10 +30,10 @@ fs.realpathSync = function (p, options) {
     throw err;
   }
 };
-if (origRealpathSync.native) {
+if (origRealpathSyncNative) {
   fs.realpathSync.native = function (p, options) {
     try {
-      return origRealpathSync.native(p, options);
+      return origRealpathSyncNative(p, options);
     } catch (err) {
       if (err && (err.code === "EPERM" || err.code === "EACCES")) {
         return path.resolve(String(p));
